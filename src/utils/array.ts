@@ -1,16 +1,16 @@
 /**
  * Repeat elements in the array until its size becomes to `targetLength`.
  */
- export function arrayRepeat<T>(base: T[], targetLength: number): T[] {
-    if (base.length === targetLength) return base;
-    else if (base.length > targetLength) return base.slice(0, targetLength);
-    else {
-        const repeated = Array.from(base);
-        do {
-            repeated.push(...Array.from(base));
-        } while (repeated.length < targetLength);
-        return repeated.slice(0, targetLength);
-    }
+export function arrayRepeat<T>(base: T[], targetLength: number): T[] {
+	if (base.length === targetLength) return base;
+	else if (base.length > targetLength) return base.slice(0, targetLength);
+	else {
+		const repeated = Array.from(base);
+		do {
+			repeated.push(...Array.from(base));
+		} while (repeated.length < targetLength);
+		return repeated.slice(0, targetLength);
+	}
 }
 
 /**
@@ -21,7 +21,7 @@
  * @returns Updated array.
  */
 export function insertItemToArray<T>(array: T[], index: number, item: T): T[] {
-    return [...array.slice(0, index), item, ...array.slice(index)];
+	return [...array.slice(0, index), item, ...array.slice(index)];
 }
 
 /**
@@ -32,7 +32,7 @@ export function insertItemToArray<T>(array: T[], index: number, item: T): T[] {
  * @returns Updated array.
  */
 export function modifyItemInArray<T>(array: T[], index: number, item: T): T[] {
-    return [...array.slice(0, index), item, ...array.slice(index + 1)];
+	return [...array.slice(0, index), item, ...array.slice(index + 1)];
 }
 
 /**
@@ -42,7 +42,7 @@ export function modifyItemInArray<T>(array: T[], index: number, item: T): T[] {
  * @returns Updated array.
  */
 export function removeItemFromArray<T>(array: T[], index: number): T[] {
-    return [...array.slice(0, index), ...array.slice(index + 1)];
+	return [...array.slice(0, index), ...array.slice(index + 1)];
 }
 
 /**
@@ -51,9 +51,9 @@ export function removeItemFromArray<T>(array: T[], index: number): T[] {
  * @returns Updated array.
  */
 export function flatArrayToPairArray<T>(array: T[]): [T, T][] {
-    const output: [T, T][] = [];
-    for (let i = 0; i < array.length; i += 2) {
-        output.push([array[i], array[i + 1]]);
-    }
-    return output;
+	const output: [T, T][] = [];
+	for (let i = 0; i < array.length; i += 2) {
+		output.push([array[i], array[i + 1]]);
+	}
+	return output;
 }

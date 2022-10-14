@@ -6,7 +6,7 @@ import InitSpec from './spec.light.json';
 import { removeItemFromArray } from './utils/array';
 import { getTrack } from './tracks';
 import { Tileset as _Tileset } from './core/data-loader';
-import { Recommendations } from './core/recommendations'
+import { Recommendations } from './core/recommendations';
 
 /**
  * Tileset information that also includes the link to the server
@@ -63,11 +63,11 @@ function App() {
 				return;
 			}
 			const { results } : { results: Tileset[] } = await response.json();
-			const tilesets = results.map(d => { return { ...d, server }});
+			const tilesets = results.map(d => { return { ...d, server };});
 			all.push(...tilesets);
 		}
 		setCompatibleDatasets(all.sort((a, b) => a.datatype < b.datatype ? 1 : -1));
-	};
+	}
 
 	useEffect(() => {
 		getCompatibleTilesets();
@@ -95,12 +95,12 @@ function App() {
 							}
 						}}/>
 						<tbody>
-						{servers.map(server => (
-							<tr className='border border-[#F0F0F0] h-[40px]'>
-								<td className='p-2'>{server}</td>
-								<td><button onClick={() => setServers(removeItemFromArray(servers, servers.indexOf(server)))}>X</button></td>
-							</tr>
-						))}
+							{servers.map(server => (
+								<tr key={server} className='border border-[#F0F0F0] h-[40px]'>
+									<td className='p-2'>{server}</td>
+									<td><button onClick={() => setServers(removeItemFromArray(servers, servers.indexOf(server)))}>X</button></td>
+								</tr>
+							))}
 						</tbody>
 					</table>
 				</div>
@@ -114,19 +114,19 @@ function App() {
 							</tr>
 						</thead>
 						<tbody>
-						{compatibleDatasets.map(d => (
-							<tr className='border border-[#F0F0F0] h-[40px]' onClick={e => {
-								const track = getTrack(d);
-								if(track)
-								setSpec({ views: [...spec.views, { tracks: [track] }]});
-							}}>
-								<td className='p-2'>
-									<input type="checkbox" className="w-4 h-4 focus:ring-blue-500 focus:ring-2"/>
-								</td>
-								<td className='p-2 max-w-[300px]'>{d.name}</td>
-								<td className='p-2'>{d.datatype.replace('gene-annotation', 'gene')}</td>
-							</tr>
-						))}
+							{compatibleDatasets.map(d => (
+								<tr key={d.server + d.uuid} className='border border-[#F0F0F0] h-[40px]' onClick={e => {
+									const track = getTrack(d);
+									if(track)
+										setSpec({ views: [...spec.views, { tracks: [track] }]});
+								}}>
+									<td className='p-2'>
+										<input type="checkbox" className="w-4 h-4 focus:ring-blue-500 focus:ring-2"/>
+									</td>
+									<td className='p-2 max-w-[300px]'>{d.name}</td>
+									<td className='p-2'>{d.datatype.replace('gene-annotation', 'gene')}</td>
+								</tr>
+							))}
 						</tbody>
 						<tr>
 							<td colSpan={3} className=' sticky bottom-0 h-[40px] bg-[#F0F0F0] border-collapse'>
@@ -147,8 +147,8 @@ function App() {
 		return (
 			<>
 				{/* DATA */}
-				<form className={`bolder-black-500`}>
-					<h1 className={`text-lg font-medium`}>Data</h1>
+				<form className={'bolder-black-500'}>
+					<h1 className={'text-lg font-medium'}>Data</h1>
 					<span className='block'>Type</span>
 					<select className='text-underline' value={selectedData.type} onChange={(e) => setSelectedData({...selectedData, type: e.target.value })}>
 						{DATATYPES.map(d => <option key={d} value={d}>{d}</option>)}
@@ -172,29 +172,29 @@ function App() {
 							if(selectedTrack?.data?.type === 'multivec') {
 								selectedTrack.data = {
 									...selectedTrack.data,
-									categories: ["sample 1", "sample 2", "sample 3", "sample 4"],
-            						binSize: 16
-								}
+									categories: ['sample 1', 'sample 2', 'sample 3', 'sample 4'],
+									binSize: 16
+								};
 							} else if(selectedTrack?.data?.type === 'bigwig') {
 								selectedTrack.data = {
 									...selectedTrack.data,
 									binSize: 8
-								}
+								};
 							}
 							if(diffData) {
 								if(selectedTrack?.data?.type === 'multivec') {
 									selectedTrack = {...selectedTrack,
-										"x": {"field": "start", "type": "genomic", "axis": "none"},
-										"xe": {"field": "end", "type": "genomic", "axis": "none"},
-										"y": {"field": "value", "type": "quantitative"},
-										"color": {"field": "category", "type": "nominal", "legend": true},
+										x: {field: 'start', type: 'genomic', axis: 'none'},
+										xe: {field: 'end', type: 'genomic', axis: 'none'},
+										y: {field: 'value', type: 'quantitative'},
+										color: {field: 'category', type: 'nominal', legend: true},
 									};
 								} else {
 									selectedTrack = {...selectedTrack,
-										"x": {"field": "start", "type": "genomic", "axis": "none"},
-										"xe": {"field": "end", "type": "genomic"},
-										"y": {"field": "value", "type": "quantitative", "axis": "none"},
-										"color": { "value": "#E79F00" }
+										x: {field: 'start', type: 'genomic', axis: 'none'},
+										xe: {field: 'end', type: 'genomic'},
+										y: {field: 'value', type: 'quantitative', axis: 'none'},
+										color: { value: '#E79F00' }
 									};
 								}
 							}
@@ -220,10 +220,10 @@ function App() {
 				</form>
 				{/* MARK */}
 				<div>
-					<h1 className={`text-lg font-medium mt-5`}>Encoding</h1>
+					<h1 className={'text-lg font-medium mt-5'}>Encoding</h1>
 					<select value={selectedMark} onChange={(e) => {
 						const selectedIndex = trackInfos.findIndex(d => d.id === selectedTrackId);
-						let selectedTrack = trackInfos[selectedIndex].spec;
+						const selectedTrack = trackInfos[selectedIndex].spec;
 						selectedTrack.mark = e.target.value as any;
 						setSelectedMark(e.target.value);
 						// console.log(selectedTrack);
@@ -301,7 +301,7 @@ function App() {
 		// });
 		return () => {
 			// gosRef.current?.api.unsubscribe('trackMouseOver');
-		}
+		};
 	}, [gosRef.current]);
 
 	useEffect(() => {

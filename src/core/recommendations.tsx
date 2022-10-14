@@ -5,8 +5,8 @@ export function Recommendations(props: {
     left: number,
     visible: boolean
 }) {
-    return (
-        <div className={`
+	return (
+		<div className={`
             z-0
             fixed
             border-grey
@@ -18,6 +18,6 @@ export function Recommendations(props: {
             bg-[lightgrey]
         `}>
             recommendation...
-        </div>
-    );
+		</div>
+	);
 }

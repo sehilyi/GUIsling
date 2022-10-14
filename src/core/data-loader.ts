@@ -21,5 +21,5 @@ export type Tileset = {
  * @returns A URL string to the HiGlass tileset.
  */
 export function getTilesetUrl(tileset: { server: string, uuid: string }) {
-    return `${tileset.server}tileset_info/?d=${tileset.uuid}`;
+	return `${tileset.server}tileset_info/?d=${tileset.uuid}`;
 }
