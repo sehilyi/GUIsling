@@ -1,0 +1,39 @@
+{
+  "name": "guisling",
+  "version": "0.0.0",
+  "type": "module",
+  "repository": "https://github.com/sehilyi/guisling.git",
+  "author": "Sehi L'Yi <sehilyi@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "start": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "format": "yarn eslint --fix --ext .ts --ext .tsx --ext .js --ext .jsx src/"
+  },
+  "dependencies": {
+    "@rjsf/core": "^4.2.3",
+    "core-js-pure": "^3.24.1",
+    "gosling.js": "^0.9.23",
+    "json-schema-merge-allof": "^0.8.1",
+    "jsonpointer": "^5.0.1",
+    "minio": "^7.0.32"
+  },
+  "devDependencies": {
+    "@types/minio": "^7.0.13",
+    "@types/react": "^17",
+    "@types/react-dom": "^17",
+    "@typescript-eslint/eslint-plugin": "^5.33.1",
+    "@typescript-eslint/parser": "^5.33.1",
+    "@vitejs/plugin-react": "^2.0.0",
+    "eslint": "^8.22.0",
+    "eslint-plugin-react": "^7.30.1",
+    "higlass": "^1.11.11",
+    "json-stringify-pretty-compact": "^4.0.0",
+    "pixi.js": "^6.4.2",
+    "react": "^17",
+    "react-dom": "^17",
+    "typescript": "^4.7.4",
+    "vite": "^3.0.2"
+  }
+}

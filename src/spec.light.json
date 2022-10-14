@@ -1,0 +1,41 @@
+{
+    "views": [
+    {
+      "tracks": [
+        {
+          "data": {
+            "url": "https://server.gosling-lang.org/api/v1/tileset_info/?d=cistrome-multivec",
+            "type": "multivec",
+            "categories": ["sample 1", "sample 2", "sample 3", "sample 4"],
+            "binSize": 16
+          },
+          "mark": "bar",
+          "x": {"field": "start", "type": "genomic", "axis": "none"},
+          "xe": {"field": "end", "type": "genomic", "axis": "none"},
+          "y": {"field": "value", "type": "quantitative"},
+          "color": {"field": "category", "type": "nominal", "legend": true, "range": ["#3275B4", "#5CB6EA", "#3275B4", "#5CB6EA"]},
+          "width": 600,
+          "height": 60
+        }
+      ]
+    },
+    {
+      "tracks": [
+        {
+            "data": {
+              "url": "https://s3.amazonaws.com/gosling-lang.org/data/HFFc6_H3K4me3.bigWig",
+              "type": "bigwig",
+              "binSize": 8
+            },
+            "mark": "bar",
+            "x": {"field": "start", "type": "genomic", "axis": "none"},
+            "xe": {"field": "end", "type": "genomic"},
+            "y": {"field": "value", "type": "quantitative", "axis": "none"},
+            "color": {"value": "#CC7DAA"},
+            "width": 600,
+            "height": 60
+        }
+      ]
+    }
+]
+}

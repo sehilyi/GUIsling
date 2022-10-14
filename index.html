@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-white">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GUI-sling</title>
+    <link rel="stylesheet" href="https://unpkg.com/higlass@1.11.3/dist/hglib.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+      }
+    </script>
+    <style>
+      html, body, #root { width: 100%; height: 100%; }
+      textarea { font-family: 'Courier New', Courier, monospace; }
+      /* To resolve style conflicts with Tailwind */
+      #gosling-component .gosling-component { height: auto !important; }
+  </style>
+  </head>
+  <body>
+    <script>
+      var process = { platform: '', env: '' };
+    </script>
+    <div id="root"></div>
+    <script type="module" src="/src/index.tsx"></script>
+  </body>
+</html>
