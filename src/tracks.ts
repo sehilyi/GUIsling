@@ -1,5 +1,6 @@
 import { Track } from "gosling.js/dist/src/core/gosling.schema"
 import { Tileset } from "./app";
+import { getTilesetUrl } from "./core/data-loader"
 
 export function getTrack(tileset: Tileset) : Track | undefined{
     switch(tileset.datatype) {
@@ -7,7 +8,7 @@ export function getTrack(tileset: Tileset) : Track | undefined{
             return {
                 data: {
                     type: 'vector',
-                    url: tileset.url,
+                    url: getTilesetUrl(tileset),
                     binSize: 16
                 },
                 mark: 'bar',
@@ -21,7 +22,7 @@ export function getTrack(tileset: Tileset) : Track | undefined{
             return {
                 data: {
                     type: 'multivec',
-                    url: tileset.url,
+                    url: getTilesetUrl(tileset),
                     binSize: 16
                 },
                 mark: 'rect',

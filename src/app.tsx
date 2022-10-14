@@ -3,16 +3,27 @@ import { GoslingComponent, GoslingRef, GoslingSpec } from 'gosling.js';
 import type { OverlaidTrack, SingleTrack } from 'gosling.js/dist/src/core/gosling.schema';
 import GoslingSchema from './gosling.schema.json';
 import InitSpec from './spec.light.json';
-import Minio from 'minio';
-import { removeItemFromArray } from './utils/array'
-import { getTrack } from './tracks'
+import { removeItemFromArray } from './utils/array';
+import { getTrack } from './tracks';
+import { Tileset as _Tileset } from './core/data-loader';
+import { Recommendations } from './core/recommendations'
+
+/**
+ * Tileset information that also includes the link to the server
+ */
+export type Tileset = _Tileset & {
+	/**
+	 * Full URL of the server (e.g., https://server.gosling-lang.org/api/v1/)
+	 */
+	server: string;
+}
 
 // TODO: Circular tracks are not supported
 // TODO: Better way to infer these?
 type LinearTrackShape = { [key in 'x' | 'y' | 'width' | 'height']: number };
 type TrackInfo = { id: string, spec: SingleTrack | OverlaidTrack, shape: LinearTrackShape };
 
-const GOSLING_PADDING = 20;
+const COMMON_PADDING = 20;
 const PANNER_INNER_PADDING = '14px';
 const DATATYPES = ['bigwig', 'multivec']; // TODO: Better way to infer these?
 
@@ -20,21 +31,6 @@ const BUTTON_STYLE = 'border-[1px] border-black';
 const MARKS = GoslingSchema.definitions.Mark.enum.filter(_ => _ !== 'header');
 const FIELDTYPE = GoslingSchema.definitions.FieldType.enum;
 const MULTIVEC_FIELDS = ['start', 'end', 'position', 'value', 'category'];
-
-export type Tileset = {
-	uuid: string;
-	datafile: string;
-	filetype: string;
-	datatype: string;
-	name: string;
-	description: string;
-	private: boolean;
-	project: string;
-	project_name: string;
-	coordSystem: string;
-	coordSystem2: string;
-	created: string;
-}
 
 function App() {
 	const gosRef = useRef<GoslingRef>(null);
@@ -45,40 +41,47 @@ function App() {
 	const [selectedData, setSelectedData] = useState({ type: undefined, url: undefined });
 	const [selectedMark, setSelectedMark] = useState(null);
 
-	const [datasets, setDatasets] = useState<Tileset[]>([]);
+	const [compatibleDatasets, setCompatibleDatasets] = useState<Tileset[]>([]);
 	const [servers, setServers] = useState([
 		'https://server.gosling-lang.org/api/v1/',
 		'http://higlass.io/api/v1/',
-		// 'https://resgen.io/api/v1/gt/paper-data/'
-	]);
-	async function getAvailableDatasets() {
-		const tilesets: Tileset[] = [];
+		'https://resgen.io/api/v1/gt/paper-data/'
+	].slice(0, 2));
+
+	/**
+	 * Get a list of compatible tilesets from HiGlass servers.
+	 */
+	async function getCompatibleTilesets() {
+		const compatibleTiles = ['vector', 'multivec', 'bedlike', 'gene-annotation', 'matrix'];
+		const all: Tileset[] = [];
 		for(const server of servers) {
 			const base = `${server}tilesets/?limit=99999`;
-			const filetypes = ['vector', 'multivec', 'bedlike', 'gene-annotation', 'matrix'];
-			const url = base + ['', ...filetypes].join('&dt=');
+			const url = base + ['', ...compatibleTiles].join('&dt=');
 			const response = await fetch(url);
-			if(!response.ok) { return; }
-			const results = await response.json();
-			tilesets.push(...(results.results as Tileset[]).map(d => { return { ...d, url: server + 'tileset_info/?d=' + d.uuid }}));
+			if(!response.ok) { 
+				console.warn('Error getting tilesets from HiGlass servers');
+				return;
+			}
+			const { results } : { results: Tileset[] } = await response.json();
+			const tilesets = results.map(d => { return { ...d, server }});
+			all.push(...tilesets);
 		}
-		setDatasets(tilesets.sort((a, b) => a.datatype > b.datatype ? 1 : -1));
-		// console.log(tilesets);
+		setCompatibleDatasets(all.sort((a, b) => a.datatype < b.datatype ? 1 : -1));
 	};
 
 	useEffect(() => {
-		getAvailableDatasets();
+		getCompatibleTilesets();
 	}, [servers]);
 
 	const availableDatasets = useMemo(() => {
 		return (
 			<>
 				<div className='p-3 h-[50px]'>
-					Total <b>{datasets.length}</b> compatible datasets found from <b>{2}</b> higlass servers and <b>{0}</b> file servers.
+					Total <b>{compatibleDatasets.length}</b> compatible datasets found from <b>{2}</b> higlass servers and <b>{0}</b> file servers.
 				</div>
 				<div>
 					<table className='w-full table-auto border-collapse'>
-						<thead className='sticky top-0 z-50 border-collapse'>
+						<thead className='sticky top-0 border-collapse'>
 							<tr className='h-[40px] bg-[#F0F0F0] border-collapse'>
 								<td className='p-2'>Servers Plugged In</td>
 								<td></td>
@@ -103,7 +106,7 @@ function App() {
 				</div>
 				<div className='flex-1 overflow-scroll'>
 					<table className='w-full table-auto border-collapse'>
-						<thead className='sticky top-0 z-50 border-collapse'>
+						<thead className='sticky top-0 border-collapse'>
 							<tr className='h-[40px] bg-[#F0F0F0] border-collapse'>
 								<td></td>
 								<td className='p-2'>Name</td>
@@ -111,7 +114,7 @@ function App() {
 							</tr>
 						</thead>
 						<tbody>
-						{datasets.map(d => (
+						{compatibleDatasets.map(d => (
 							<tr className='border border-[#F0F0F0] h-[40px]' onClick={e => {
 								const track = getTrack(d);
 								if(track)
@@ -120,21 +123,21 @@ function App() {
 								<td className='p-2'>
 									<input type="checkbox" className="w-4 h-4 focus:ring-blue-500 focus:ring-2"/>
 								</td>
-								<td className='p-2'>{d.name.slice(0, 40) + '...'}</td>
+								<td className='p-2 max-w-[300px]'>{d.name}</td>
 								<td className='p-2'>{d.datatype.replace('gene-annotation', 'gene')}</td>
 							</tr>
 						))}
 						</tbody>
 						<tr>
-							<td colSpan={3} className=' sticky bottom-0 z-50 h-[40px] bg-[#F0F0F0] border-collapse'>
-								Total <b>{datasets.length}</b> compatible datasets
+							<td colSpan={3} className=' sticky bottom-0 h-[40px] bg-[#F0F0F0] border-collapse'>
+								Total <b>{compatibleDatasets.length}</b> compatible datasets
 							</td>
 						</tr>
 					</table>
 				</div>
 			</>
 		);
-	}, [datasets, spec]);
+	}, [compatibleDatasets, spec]);
 
 	const gosViewWidgets = useMemo(() => {
 		const view = trackInfos.find(d => d.id === selectedTrackId)?.spec;
@@ -280,9 +283,9 @@ function App() {
 		);
 	}, [spec, selectedTrackId, selectedData, selectedMark]);
 
+	// DEBUG
 	useEffect(() => {
-		// Debug
-		console.log(spec);
+		console.warn(spec);
 	}, [spec]);
 
 	useEffect(() => {
@@ -318,7 +321,7 @@ function App() {
 
 	return (
 		<div className='h-full bg-[#F5F5F5]'>
-			{/* <nav className="flex items-center justify-between flex-wrap bg-[#E18241] h-[5px]"></nav> */}
+			<nav className="flex items-center justify-between flex-wrap bg-[#E18241] h-[5px]"></nav>
 			<div className="flex flex-col w-full h-[100%] divide-y divide-solid">
 				<div className="flex-1 flex flex-row overflow-hidden divide-x divide-solid divide-[#DADADA]">
 					<div className={`flex-1 p-[${PANNER_INNER_PADDING}]`}>
@@ -336,12 +339,12 @@ function App() {
 						</div>
 					</div> */}
 					<div className={`flex-1 p-[${PANNER_INNER_PADDING}]`}>
-						<div className='w-full h-full bg-[white] overflow-scroll'>
+						<div className='w-full h-full bg-[white] overflow-scroll p-[20px]'>
 							<GoslingComponent
 								ref={gosRef}
 								spec={spec}
 								margin={0}
-								padding={GOSLING_PADDING}
+								padding={0}
 								// theme={theme}
 								// experimental={{ reactive: true }}
 							/>
@@ -349,8 +352,8 @@ function App() {
 								`
 								absolute
 								cursor-pointer
-								left-[${d.shape.x + GOSLING_PADDING}px]
-								top-[${d.shape.y + GOSLING_PADDING}px]
+								left-[${d.shape.x + COMMON_PADDING}px]
+								top-[${d.shape.y + COMMON_PADDING}px]
 								w-[${d.shape.width}px]
 								h-[${d.shape.height}px]
 								${d.id === selectedTrackId ? 'outline' : 'hover:outline'}
@@ -364,7 +367,7 @@ function App() {
 						</div>
 					</div>
 					<div className={`flex-1 p-[${PANNER_INNER_PADDING}]`}>
-						<div className={`w-full h-full bg-[white] overflow-scroll p-[${GOSLING_PADDING}px]`}>
+						<div className={`w-full h-full bg-[white] overflow-scroll p-[${COMMON_PADDING}px]`}>
 							{gosViewWidgets}
 							{/* TRACK REMOVE */}
 							{/* <button className={BUTTON_STYLE} onClick={() => {setSpec({
@@ -381,6 +384,11 @@ function App() {
 					</div>
 				</div>
 			</div>
+			<Recommendations 
+				left={500}
+				top={500}
+				visible={selectedTrackId !== undefined}
+			/>
 		</div>
 	);
 }

@@ -1,6 +1,9 @@
 import { Theme } from "gosling.js";
 
 // TODO: dark theme seems to be broken by undefined properties under `axis` and `legend`
+/**
+ * Deprecated: Custom themes that we use
+ */
 export const theme: Theme = {
     base: 'dark',
     root: {
